@@ -17,7 +17,7 @@ Um sistema simples de gerenciamento de estacionamento desenvolvido em C# para in
 ## 📁 Estrutura do Projeto
 
 ```
-SistemaEstacionamento/
+ProjetoEstacionamento/
 ├── Models/
 │   └── Estacionamento.cs    # Classe com métodos do estacionamento
 ├── Program.cs               # Arquivo principal com menu
