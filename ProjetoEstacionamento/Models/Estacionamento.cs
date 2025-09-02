@@ -73,7 +73,7 @@ namespace ProjetoEstacionamento.Models
 
         public bool CadastrarEntrada(out string mensagem)
         {
-            Console.WriteLine("Digite a placa do veículo:");
+            Console.WriteLine("Digite a placa do veículo (ex: ABC-1D23):");
 
             string placaEntrada = Console.ReadLine();
 
@@ -106,7 +106,7 @@ namespace ProjetoEstacionamento.Models
 
         public bool RegistrarSaida(out string mensagem)
         {
-            Console.WriteLine("Digite a placa do veículo:");
+            Console.WriteLine("Digite a placa do veículo (ex: ABC-1D23):");
 
             string placaSaida = Console.ReadLine();
 
