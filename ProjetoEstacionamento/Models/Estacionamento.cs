@@ -77,6 +77,12 @@ namespace ProjetoEstacionamento.Models
 
             string placaEntrada = Console.ReadLine();
 
+            if (placaEntrada.Length != 8 || placaEntrada[3] != '-')
+            {
+                mensagem = "Formato de placa inválido! Use o formato: ABC-1234";
+                return false;
+            }
+
             if (ExisteRegistroEmAberto(placaEntrada))
             {
                 mensagem = $"Não é possível cadastrar a placa {placaEntrada}. " +
