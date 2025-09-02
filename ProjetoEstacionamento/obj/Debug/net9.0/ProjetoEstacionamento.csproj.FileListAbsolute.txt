@@ -12,3 +12,4 @@ C:\Users\pedro\OneDrive\Área de Trabalho\Projetos\ProjetoEstacionamento\Projeto
 C:\Users\pedro\OneDrive\Área de Trabalho\Projetos\ProjetoEstacionamento\ProjetoEstacionamento\obj\Debug\net9.0\ProjetoEstacionamento.pdb
 C:\Users\pedro\OneDrive\Área de Trabalho\Projetos\ProjetoEstacionamento\ProjetoEstacionamento\obj\Debug\net9.0\ProjetoEstacionamento.genruntimeconfig.cache
 C:\Users\pedro\OneDrive\Área de Trabalho\Projetos\ProjetoEstacionamento\ProjetoEstacionamento\obj\Debug\net9.0\ref\ProjetoEstacionamento.dll
+C:\Users\pedro\OneDrive\Área de Trabalho\Projetos\ProjetoEstacionamento\ProjetoEstacionamento\obj\Debug\net9.0\ProjetoEstacionamento.sourcelink.json

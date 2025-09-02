@@ -2,17 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Globalization;
+
 
 namespace ProjetoEstacionamento.Models
 {
     public class Estacionamento
     {
-        string placa;
-        int horasPermanecidas;
-        int valorInicial;
-        int valorVariavel;
-        int[] arrayValores = new int[2];
-        List<string> listaVeiculos = new List<string>();
+
+        double[] arrayValores = new double[2];
+        private List<Carro> carrosRegistrados;
+        
+
+        public Estacionamento()
+        {
+            carrosRegistrados = new List<Carro>();
+        }
 
         public void PausarTela()
         {
@@ -22,63 +27,145 @@ namespace ProjetoEstacionamento.Models
 
         public void AtribuirValores()
         {
-            Console.WriteLine("Bem vindo ao Estacionamento. Digite o valor inicial:");
-
-            valorInicial = Convert.ToInt32(Console.ReadLine());
-
-            arrayValores[0] = valorInicial;
-
-            Console.WriteLine("Digite o valor para as horas adicionais:");
-
-            valorVariavel = Convert.ToInt32(Console.ReadLine());
-
-            arrayValores[1] = valorVariavel;
-        }
-
-        public void AdicionarVeiculo()
-        {
-            Console.Clear();
-
-            Console.WriteLine("Digite a placa do veículo:");
-
-            placa = Console.ReadLine();
-
-            listaVeiculos.Add(placa);
-
-            Console.WriteLine("\nVeículo adicionado com sucesso!");
-
-            PausarTela();
-        }
-
-        public void ListarVeiculos()
-        {
-            Console.Clear();
-
-            foreach (string veiculo in listaVeiculos)
+            bool exibirValorInicial = true;
+            while (exibirValorInicial)
             {
-                Console.WriteLine(veiculo);
+                Console.WriteLine("Bem vindo ao Estacionamento. Digite o valor inicial:");
+
+                string valorInicialTexto = Console.ReadLine();
+                if (double.TryParse(valorInicialTexto, NumberStyles.Float, CultureInfo.InvariantCulture, out double resultadoValorInicial))
+                {
+                    double valorInicial = resultadoValorInicial;
+                    arrayValores[0] = valorInicial;
+                    exibirValorInicial = false;
+                }
+                else
+                {
+                    Console.WriteLine("Valor inválido!");
+                }
             }
 
-            PausarTela();
+            bool exibirValorAdicional = true;
+            while (exibirValorAdicional)
+            {
+                Console.WriteLine("Digite o valor para as horas adicionais:");
+
+                string valorAdicionalTexto = Console.ReadLine();
+                if (double.TryParse(valorAdicionalTexto, NumberStyles.Float, CultureInfo.InvariantCulture, out double resultadoValorAdicional))
+                {
+                    double valorAdicional = resultadoValorAdicional;
+                    arrayValores[1] = valorAdicional;
+                    exibirValorAdicional = false;
+                }
+                else
+                {
+                    Console.WriteLine("Valor inválido!");
+                }
+            }
+
         }
 
-        public void RemoverVeiculo()
+        public bool ExisteRegistroEmAberto(string placa)
         {
-            Console.Clear();
-
-            Console.WriteLine("Qual veículo deseja remover?");
-
-            placa = Console.ReadLine();
-
-            listaVeiculos.Remove(placa);
-
-            Console.WriteLine("Quantas horas o veículo permaneceu no estacionamento?");
-
-            horasPermanecidas = Convert.ToInt32(Console.ReadLine());
-
-            Console.WriteLine($"O valor total do veículo {placa} foi de: R${arrayValores[0] + (arrayValores[1] * horasPermanecidas)}");
-
-            PausarTela();
+            return carrosRegistrados.Any(carro => carro.Placa.Equals(placa, StringComparison.OrdinalIgnoreCase)
+                                                                    && carro.DataHoraSaida == null);
         }
+
+        public bool CadastrarEntrada(out string mensagem)
+        {
+            Console.WriteLine("Digite a placa do veículo:");
+
+            string placaEntrada = Console.ReadLine();
+
+            if (ExisteRegistroEmAberto(placaEntrada))
+            {
+                mensagem = $"Não é possível cadastrar a placa {placaEntrada}. " +
+                          "Já existe um registro em aberto para este veículo.";
+                return false;
+            }
+
+            Console.WriteLine("Digite o horário de entrada:");
+
+            string horarioEntrada = Console.ReadLine();
+
+            if (DateTime.TryParseExact(horarioEntrada, "dd/MM/yyyy HH:mm",
+                                  CultureInfo.InvariantCulture, DateTimeStyles.None,
+                                  out DateTime resultado))
+            {
+                var novoCarro = new Carro(placaEntrada, horarioEntrada);
+                carrosRegistrados.Add(novoCarro);
+                mensagem = $"Veículo {placaEntrada} cadastrado com sucesso.";
+                return true;
+            }
+            else
+            {
+                mensagem = "Hora de entrada inválida.";
+                return false;
+            }
+        }
+
+        public bool RegistrarSaida(out string mensagem)
+        {
+            Console.WriteLine("Digite a placa do veículo:");
+
+            string placaSaida = Console.ReadLine();
+
+            var carroEmAberto = carrosRegistrados.FirstOrDefault(carro => carro.Placa.Equals(placaSaida, StringComparison.OrdinalIgnoreCase)
+                                                                    && carro.DataHoraSaida == null);
+
+            if (carroEmAberto == null)
+            {
+                mensagem = "Carro não encontrado.";
+                return false;
+            }
+            else
+            {
+                Console.WriteLine("Digite o horário de saída:");
+
+                string horarioSaida = Console.ReadLine();
+
+                if (carroEmAberto != null)
+                {
+                    if (DateTime.TryParseExact(horarioSaida, "dd/MM/yyyy HH:mm",
+                                          CultureInfo.InvariantCulture, DateTimeStyles.None,
+                                          out DateTime resultado))
+                    {
+                        carroEmAberto.DataHoraSaida = resultado;
+
+                        TimeSpan tempoEstacionado = resultado - carroEmAberto.DataHoraEntrada;
+
+                        int horasCompletas = (int)tempoEstacionado.TotalHours;
+
+                        double valorTotal = 0;
+                        if (horasCompletas <= 1)
+                        {
+                            valorTotal = arrayValores[0];
+                        }
+                        else
+                        {
+                            valorTotal = arrayValores[0] + ((horasCompletas - 1) * arrayValores[1]);
+                        }
+
+                        mensagem =  $"Veículo {placaSaida} removido do estacionamento com sucesso.\n" +
+                                    $"Tempo estacionado: {horasCompletas:F2} horas\n" +
+                                    $"Valor a pagar: R$ {valorTotal:F2}";
+                        return true;
+                    }
+                }
+                mensagem = "Hora de saída inválida.";
+                return false;
+            }
+        }
+
+        public List<Carro> ObterCarroEmAberto()
+        {
+            return carrosRegistrados.Where(carro => carro.DataHoraSaida == null).ToList();
+        }
+
+        public List<Carro> ObterHistoricoPorPlaca(string placa)
+        {
+            return carrosRegistrados.Where(carro => carro.Placa.Equals(placa, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
     }
 }
